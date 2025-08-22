@@ -20,7 +20,7 @@ public class Quiz : MonoBehaviour
         }
     }
 
-    public void OnanswerButtonClicled(int index)
+    public void OnanswerButtonClicked(int index)
     {
         if (index == question.GetCorrectAnswerIndex())
         {
