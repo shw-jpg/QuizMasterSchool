@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,11 +29,17 @@ public class Quiz : MonoBehaviour
     [SerializeField] TextMeshProUGUI scoreText;
     SocreKeeper scoreKeeper;
 
+    [Header("ProgressBar")]
+    [SerializeField] Slider progressBar;
+    
 
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
         scoreKeeper = FindFirstObjectByType<SocreKeeper>();
+        progressBar.maxValue = questions.Count;
+        progressBar.value = 0;
+
         GetNoxtQuestion();
     }
 
@@ -74,6 +81,7 @@ public class Quiz : MonoBehaviour
         GetRsndomQuesion();
         OnDisplayQuestion();
         scoreKeeper.IncrementQuestionSeen();
+        progressBar.value++;
     }
 
     private void GetRsndomQuesion()
@@ -100,6 +108,8 @@ public class Quiz : MonoBehaviour
         DisplaySolution(index);
         timer.CancelTimer();
         scoreText.text = $"Score:{scoreKeeper.CalculareScore()}%";
+
+        
     }
 
     private void DisplaySolution(int index)
