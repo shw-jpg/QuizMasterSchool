@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,7 +31,7 @@ public class Quiz : MonoBehaviour
 
     [Header("ProgressBar")]
     [SerializeField] Slider progressBar;
-    
+
 
     void Start()
     {
@@ -55,6 +55,15 @@ public class Quiz : MonoBehaviour
         //다음 질문 불러오기
         if (timer.loadNextQuestion)
         {
+            if (questions.Count <= 0)
+            {
+                GameManager.Instance.ShowEndSceen();
+            }
+            else
+            {
+                timer.loadNextQuestion = false;
+            }
+
             timer.loadNextQuestion = false;
             GetNoxtQuestion();
         }
@@ -109,7 +118,7 @@ public class Quiz : MonoBehaviour
         timer.CancelTimer();
         scoreText.text = $"Score:{scoreKeeper.CalculareScore()}%";
 
-        
+
     }
 
     private void DisplaySolution(int index)
@@ -141,5 +150,10 @@ public class Quiz : MonoBehaviour
         {
             obj.GetComponent<Button>().interactable = state;
         }
+    }
+
+    internal void RestartQuiz()
+    {
+        throw new NotImplementedException();
     }
 }
