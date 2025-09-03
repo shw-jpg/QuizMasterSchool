@@ -6,8 +6,9 @@ public class Timer : MonoBehaviour
     [SerializeField] float solutionTime = 3f;
     float time = 0;
 
-    [HideInInspector] public bool isProblemTime = false;
-    [HideInInspector] public float fillAmount; 
+    [HideInInspector] public bool isProblemTime = true;
+    [HideInInspector] public float fillAmount;
+    [HideInInspector] public bool loadNextQuestion;
 
     private void Start()
     {
@@ -16,13 +17,22 @@ public class Timer : MonoBehaviour
 
     private void Update()
     {
-        timerCountDown();
+        TimerCountDown();
         UpdateFillAmount();
     }
 
-    private void timerCountDown()
+    private void UpdateFillAmount()
     {
-        Debug.Log("Time remaining: " + time);
+        if (isProblemTime)
+            fillAmount = time / problemTime;
+
+        else
+            fillAmount = time / solutionTime;
+    }
+
+
+    private void TimerCountDown()
+    {
         time -= Time.deltaTime;
         if (time <= 0)
         {
@@ -35,16 +45,13 @@ public class Timer : MonoBehaviour
             {
                 isProblemTime = true;
                 time = problemTime;
+                loadNextQuestion = true;
             }
         }
     }
 
-    private void UpdateFillAmount()
+    public void CancelTimer()
     {
-        if (isProblemTime)
-            fillAmount = time / problemTime;
-
-        else
-            fillAmount = time / solutionTime;
+        time = 0;
     }
 }

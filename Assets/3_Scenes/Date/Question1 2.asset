@@ -12,5 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9e522a91da307845a06a4a03865eaf5, type: 3}
   m_Name: Question1 2
   m_EditorClassIdentifier: 
-  question: "1.\uC5EC\uAE30\uC5D0 \uC9C8\uBB38\uC744 \uC801\uC5B4\uC8FC\uC138\uC694\n2.\uC5EC\uAE30\uC5D0
-    \uC9C8\uBB38\uC744 \uC801\uC5B4\uC8FC\uC138\uC694"
+  question: "2.\uD0C0\uC774\uD0C0\uB2C9\uC758 \uAD6C\uBA85\uBCF4\uD2B8\uB294 \uBA87
+    \uBA85\uC774 \uD0C8\uC218 \uC788\uC744\uAE4C?\r"
+  answers:
+  - "1.9\uBA85(\uC815\uB2F5)"
+  - "2.10\uBA85"
+  - "3.11\uBA85"
+  - "4.12\uBA85"
+  correctAnswerlndex: 0
