@@ -3,16 +3,18 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
+
     [SerializeField] private Quiz quiz;
     [SerializeField] private EndScreen endScreen;
-    public static GameManager Instance { get; private set; }
+    
 
     void Awake()
     {
         if (Instance == null)
         {
-           Instance = null;
-           DontDestroyOnLoad(gameObject);
+            Instance = this;
+            //DontDestroyOnLoad(gameObject);
         }
         else if (Instance != this)
         {
@@ -22,9 +24,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        showQuinSceen();
+        showQuizSceen();
     }
-    public void showQuinSceen()
+
+    public void showQuizSceen()
     {
         quiz.gameObject.SetActive(true);
         endScreen.gameObject.SetActive(false);

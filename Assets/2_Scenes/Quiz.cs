@@ -32,7 +32,6 @@ public class Quiz : MonoBehaviour
     [Header("ProgressBar")]
     [SerializeField] Slider progressBar;
 
-
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
@@ -62,10 +61,8 @@ public class Quiz : MonoBehaviour
             else
             {
                 timer.loadNextQuestion = false;
+                GetNoxtQuestion();
             }
-
-            timer.loadNextQuestion = false;
-            GetNoxtQuestion();
         }
 
         //SolutionTime이고 답을 선택하지 않았을 때
@@ -117,8 +114,6 @@ public class Quiz : MonoBehaviour
         DisplaySolution(index);
         timer.CancelTimer();
         scoreText.text = $"Score:{scoreKeeper.CalculareScore()}%";
-
-
     }
 
     private void DisplaySolution(int index)

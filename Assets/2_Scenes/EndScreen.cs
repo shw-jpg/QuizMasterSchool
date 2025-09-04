@@ -9,6 +9,6 @@ public class EndScreen : MonoBehaviour
     public void ShowFinalScore()
     {
         finalScoreText.text = "축하합니다!\n\n" +
-            $"단신의 범수는 {scoreKeeper.CalculareScore()}%입니다.";
+            $"당신의 점수는 {scoreKeeper.CalculareScore()}%입니다.";
     }
 }
