@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -32,14 +31,36 @@ public class Quiz : MonoBehaviour
     [Header("ProgressBar")]
     [SerializeField] Slider progressBar;
 
+    bool isGenerateQuestions = false;
+
+
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
         scoreKeeper = FindFirstObjectByType<SocreKeeper>();
+
+        if (questions.Count <= 0)
+        {
+            GenerateQestionslfNeeded();
+        }
+        else
+        {
+            InitializeProgressBar();
+        }
+    }
+
+    private void GenerateQestionslfNeeded()
+    {
+        if (isGenerateQuestions) return;
+
+        isGenerateQuestions = true;
+        GameManager.Instance.ShowLoadingSceen();
+    }
+
+    private void InitializeProgressBar()
+    {
         progressBar.maxValue = questions.Count;
         progressBar.value = 0;
-
-        GetNoxtQuestion();
     }
 
     private void Update()
@@ -54,9 +75,10 @@ public class Quiz : MonoBehaviour
         //다음 질문 불러오기
         if (timer.loadNextQuestion)
         {
-            if (questions.Count <= 0)
+            if (questions.Count == 0)
             {
-                GameManager.Instance.ShowEndSceen();
+                GenerateQestionslfNeeded();
+                //GameManager.Instance.ShowEndSceen();
             }
             else
             {
@@ -75,12 +97,14 @@ public class Quiz : MonoBehaviour
 
     private void GetNoxtQuestion()
     {
+        Debug.Log("GameManager ShowEndSceen");
         if (questions.Count <= 0)
         {
-            Debug.Log("남은 문제가 없습니다.");
+            Debug.Log("남은 문제가 없습니다."); 
             return;
         }
 
+        GameManager.Instance.ShowQuizSceen();
         chooseAnswer = false;
         SetButtoState(true);
         SetDefsultButtonSprites();
@@ -145,10 +169,5 @@ public class Quiz : MonoBehaviour
         {
             obj.GetComponent<Button>().interactable = state;
         }
-    }
-
-    internal void RestartQuiz()
-    {
-        throw new NotImplementedException();
     }
 }

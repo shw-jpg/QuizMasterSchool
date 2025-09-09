@@ -3,11 +3,12 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    public static GameManager Instance;
 
     [SerializeField] private Quiz quiz;
     [SerializeField] private EndScreen endScreen;
-    
+    [SerializeField] private GameObject losdingCanves;
+
 
     void Awake()
     {
@@ -24,13 +25,14 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        showQuizSceen();
+        //ShowQuizSceen();
     }
 
-    public void showQuizSceen()
+    public void ShowQuizSceen()
     {
         quiz.gameObject.SetActive(true);
         endScreen.gameObject.SetActive(false);
+        losdingCanves.SetActive(false);
     }
 
     public void ShowEndSceen()
@@ -38,6 +40,14 @@ public class GameManager : MonoBehaviour
         quiz.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(true);
         endScreen.ShowFinalScore();
+        losdingCanves.SetActive(false);
+    }
+
+    public void ShowLoadingSceen()
+    {
+        quiz.gameObject.SetActive(false);
+        endScreen.gameObject.SetActive(false);
+        losdingCanves.SetActive(true);
     }
 
     public void OnReplayLevel()
