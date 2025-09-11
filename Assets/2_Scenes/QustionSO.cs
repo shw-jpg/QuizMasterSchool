@@ -6,7 +6,7 @@ public class QuestionSO : ScriptableObject
     [TextArea(2, 6)]
     [SerializeField] string question = "여기에 질문을 적어주세요";
     [SerializeField] string[] answers = new string[4];
-    [SerializeField] int correctAnswerlndex;
+    [SerializeField] int correctAnswerlndex = 0;
 
     public string GetQuestion()
     {
@@ -26,5 +26,12 @@ public class QuestionSO : ScriptableObject
     public int GetCorrectAnswerIndex()
     {
         return correctAnswerlndex;
+    }
+
+    public void SerData(string q, string[] a, int corrctindex)
+    {
+        question = q;
+        answers = a;
+        correctAnswerlndex = corrctindex;
     }
 }
