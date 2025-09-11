@@ -31,13 +31,16 @@ public class Quiz : MonoBehaviour
     [Header("ProgressBar")]
     [SerializeField] Slider progressBar;
 
+    [Header("ChatGPTClinet")]
+    [SerializeField] ChatGPTClinet chatGPTClinet;
+    [SerializeField] int questionCount = 3;
     bool isGenerateQuestions = false;
-
 
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
         scoreKeeper = FindFirstObjectByType<SocreKeeper>();
+        chatGPTClinet.quizGerateHandier += QuizGeneratedHandler;
 
         if (questions.Count <= 0)
         {
@@ -55,7 +58,27 @@ public class Quiz : MonoBehaviour
 
         isGenerateQuestions = true;
         GameManager.Instance.ShowLoadingSceen();
+
+        string topicToUse = GetTrendingTopic();
+        chatGPTClinet.GenerateQuestions(questionCount, topicToUse);
+        Debug.Log($"GenerateQestionslfNeeded {topicToUse}");
     }
+
+    private string GetTrendingTopic()
+    {
+        string[] topics = new string[] { "과학", "역사", "음악", "영화", "스포츠",
+            "기술","문학","지리","예술", "동물","음식"};
+        int randomlndx = UnityEngine.Random.Range(0, topics.Length);
+        return topics[randomlndx];
+    }
+
+    void QuizGeneratedHandler(List<QuestionSO> questions)
+    {
+        //questions .....처리~
+        Debug.Log($"QuizGeneratedHandler {questions.Count} questions received.");
+        isGenerateQuestions = false;
+    }
+
 
     private void InitializeProgressBar()
     {
@@ -100,7 +123,7 @@ public class Quiz : MonoBehaviour
         Debug.Log("GameManager ShowEndSceen");
         if (questions.Count <= 0)
         {
-            Debug.Log("남은 문제가 없습니다."); 
+            Debug.Log("남은 문제가 없습니다.");
             return;
         }
 
