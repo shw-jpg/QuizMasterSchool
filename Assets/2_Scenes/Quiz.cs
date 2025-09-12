@@ -34,6 +34,7 @@ public class Quiz : MonoBehaviour
     [Header("ChatGPTClinet")]
     [SerializeField] ChatGPTClinet chatGPTClinet;
     [SerializeField] int questionCount = 3;
+    [SerializeField] TextMeshProUGUI loadingText;
     bool isGenerateQuestions = false;
 
     void Start()
@@ -72,11 +73,22 @@ public class Quiz : MonoBehaviour
         return topics[randomlndx];
     }
 
-    void QuizGeneratedHandler(List<QuestionSO> questions)
+    void QuizGeneratedHandler(List<QuestionSO> generatedQuestions)
     {
         //questions .....처리~
-        Debug.Log($"QuizGeneratedHandler {questions.Count} questions received.");
         isGenerateQuestions = false;
+
+        if(generatedQuestions == null || generatedQuestions.Count == 0)
+        {
+            Debug.LogError("문제 생성에 실패했습니다.");
+            loadingText.text = "문제 생성에 실패했습니다.\n 인터넷 연결을 확인하고 다시 시도하세요.";
+            return;
+        }
+
+        questions.AddRange(generatedQuestions);
+        progressBar.maxValue += questions.Count;
+
+        GetNoxtQuestion();
     }
 
 
@@ -105,7 +117,7 @@ public class Quiz : MonoBehaviour
             }
             else
             {
-                timer.loadNextQuestion = false;
+                //timer.loadNextQuestion = false;
                 GetNoxtQuestion();
             }
         }
@@ -120,12 +132,14 @@ public class Quiz : MonoBehaviour
 
     private void GetNoxtQuestion()
     {
-        Debug.Log("GameManager ShowEndSceen");
+        
         if (questions.Count <= 0)
         {
             Debug.Log("남은 문제가 없습니다.");
             return;
         }
+
+        timer.loadNextQuestion = false;
 
         GameManager.Instance.ShowQuizSceen();
         chooseAnswer = false;

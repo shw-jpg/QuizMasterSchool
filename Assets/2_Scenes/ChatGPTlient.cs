@@ -36,7 +36,6 @@ public class ChatGPTClinet : MonoBehaviour
 
         quizGerateHandier?.Invoke(questions);
         Debug.Log("Finished GenerateWithDelay...........");
-
     }
 
     QuestionSO CreateQuesion(string q, string[] answers, int correctIndex)
