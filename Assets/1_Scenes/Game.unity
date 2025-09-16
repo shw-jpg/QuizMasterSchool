@@ -2925,6 +2925,7 @@ MonoBehaviour:
   progressBar: {fileID: 1722746626}
   chatGPTClinet: {fileID: 1145773222}
   questionCount: 3
+  loadingText: {fileID: 630967143}
 --- !u!1 &1722746624
 GameObject:
   m_ObjectHideFlags: 0
