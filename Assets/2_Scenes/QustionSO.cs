@@ -30,6 +30,10 @@ public class QuestionSO : ScriptableObject
     {
         return correctAnswerIndex;
     }
+    internal string GetHint()
+    {
+        return hint;
+    }
 
     public void SetData(string q, string[] a, int corrctindex, string h)
     {
@@ -42,10 +46,4 @@ public class QuestionSO : ScriptableObject
         answers = a;
         correctAnswerIndex = corrctindex;
     }
-
-    internal string GetHint()
-    {
-        return hint;
-    }
-
 }

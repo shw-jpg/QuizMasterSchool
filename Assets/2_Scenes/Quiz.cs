@@ -77,7 +77,6 @@ public class Quiz : MonoBehaviour
 
     void QuizGeneratedHandler(List<QuestionSO> generatedQuestions)
     {
-        //questions .....처리~
         isGenerateQuestions = false;
 
         if(generatedQuestions == null || generatedQuestions.Count == 0)
@@ -94,7 +93,6 @@ public class Quiz : MonoBehaviour
 
         GetNextQuestion();
     }
-
 
     private void InitializeProgressBar()
     {
@@ -165,6 +163,9 @@ public class Quiz : MonoBehaviour
 
     private void OnDisplayQuestion()
     {
+        questionText.text = currentQuestion.GetQuestion();
+        hintText.text = "힌트: " + currentQuestion.GetHint();
+
         if (currentQuestion == null)
         {
             Debug.LogError("currentQuestion is null");
@@ -175,9 +176,6 @@ public class Quiz : MonoBehaviour
         {
             answerButtonArr[i].GetComponentInChildren<TextMeshProUGUI>().text = currentQuestion.Getanswer(i);
         }
-
-        questionText.text = currentQuestion.GetQuestion();
-        hintText.text = "힌트: " + currentQuestion.GetHint();
     }
 
     public void OnanswerButtonClicked(int index)
