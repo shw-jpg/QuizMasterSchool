@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SocreKeeper : MonoBehaviour
+public class ScoreKeeper : MonoBehaviour
 {
     int correctAnswers = 0;
     int questionSeen = 0;

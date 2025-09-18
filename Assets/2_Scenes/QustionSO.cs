@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [CreateAssetMenu(menuName = "Quiz Question", fileName = "New Question")]
 public class QuestionSO : ScriptableObject
@@ -6,7 +8,8 @@ public class QuestionSO : ScriptableObject
     [TextArea(2, 6)]
     [SerializeField] string question = "여기에 질문을 적어주세요";
     [SerializeField] string[] answers = new string[4];
-    [SerializeField] int correctAnswerlndex = 0;
+    [SerializeField] int correctAnswerIndex = 0;
+    [SerializeField] string hint = "빈값";
 
     public string GetQuestion()
     {
@@ -20,18 +23,28 @@ public class QuestionSO : ScriptableObject
 
     public string GetCorrectAnswer()
     {
-        return answers[correctAnswerlndex];
+        return answers[correctAnswerIndex];
     }
 
     public int GetCorrectAnswerIndex()
     {
-        return correctAnswerlndex;
+        return correctAnswerIndex;
     }
 
-    public void SerData(string q, string[] a, int corrctindex)
+    public void SetData(string q, string[] a, int corrctindex, string h)
+    {
+        SetData(q, a, corrctindex);
+        hint = h;
+    }
+    public void SetData(string q, string[] a, int corrctindex)
     {
         question = q;
         answers = a;
-        correctAnswerlndex = corrctindex;
+        correctAnswerIndex = corrctindex;
+    }
+
+    internal string GetHint()
+    {
+        return hint;
     }
 }

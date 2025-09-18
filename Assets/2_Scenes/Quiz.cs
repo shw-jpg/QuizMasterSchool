@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,22 +27,23 @@ public class Quiz : MonoBehaviour
 
     [Header("점수")]
     [SerializeField] TextMeshProUGUI scoreText;
-    SocreKeeper scoreKeeper;
+    ScoreKeeper scoreKeeper;
 
     [Header("ProgressBar")]
     [SerializeField] Slider progressBar;
 
-    [Header("ChatGPTClinet")]
-    [SerializeField] ChatGPTClinet chatGPTClinet;
+    [Header("ChatGPTClient")]
+    [SerializeField] ChatGPTClient chatGPTClinet;
     [SerializeField] int questionCount = 3;
     [SerializeField] TextMeshProUGUI loadingText;
     bool isGenerateQuestions = false;
+    [SerializeField] TextMeshProUGUI hintText;
 
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
-        scoreKeeper = FindFirstObjectByType<SocreKeeper>();
-        chatGPTClinet.quizGerateHandier += QuizGeneratedHandler;
+        scoreKeeper = FindFirstObjectByType<ScoreKeeper>();
+        chatGPTClinet.quizGenerateHandler += QuizGeneratedHandler;
 
         if (questions.Count <= 0)
         {
@@ -61,7 +63,7 @@ public class Quiz : MonoBehaviour
         GameManager.Instance.ShowLoadingSceen();
 
         string topicToUse = GetTrendingTopic();
-        chatGPTClinet.GenerateQuestions(questionCount, topicToUse);
+        chatGPTClinet.GenerateQuizQuestions(questionCount, topicToUse);
         Debug.Log($"GenerateQestionslfNeeded {topicToUse}");
     }
 
@@ -85,10 +87,12 @@ public class Quiz : MonoBehaviour
             return;
         }
 
+        generatedQuestions.RemoveAll(q => q == null);
+
         questions.AddRange(generatedQuestions);
         progressBar.maxValue += questions.Count;
 
-        GetNoxtQuestion();
+        GetNextQuestion();
     }
 
 
@@ -118,7 +122,7 @@ public class Quiz : MonoBehaviour
             else
             {
                 //timer.loadNextQuestion = false;
-                GetNoxtQuestion();
+                GetNextQuestion();
             }
         }
 
@@ -130,7 +134,7 @@ public class Quiz : MonoBehaviour
 
     }
 
-    private void GetNoxtQuestion()
+    private void GetNextQuestion()
     {
         
         if (questions.Count <= 0)
@@ -145,13 +149,13 @@ public class Quiz : MonoBehaviour
         chooseAnswer = false;
         SetButtoState(true);
         SetDefsultButtonSprites();
-        GetRsndomQuesion();
+        GetRandomQuestion();
         OnDisplayQuestion();
         scoreKeeper.IncrementQuestionSeen();
         progressBar.value++;
     }
 
-    private void GetRsndomQuesion()
+    private void GetRandomQuestion()
     {
         int randomlndex = UnityEngine.Random.Range(0, questions.Count);
         currentQuestion = questions[randomlndex];
@@ -161,12 +165,19 @@ public class Quiz : MonoBehaviour
 
     private void OnDisplayQuestion()
     {
-        questionText.text = currentQuestion.GetQuestion();
+        if (currentQuestion == null)
+        {
+            Debug.LogError("currentQuestion is null");
+            return;
+        }
 
         for (int i = 0; i < answerButtonArr.Length; i++)
         {
             answerButtonArr[i].GetComponentInChildren<TextMeshProUGUI>().text = currentQuestion.Getanswer(i);
         }
+
+        questionText.text = currentQuestion.GetQuestion();
+        hintText.text = "힌트: " + currentQuestion.GetHint();
     }
 
     public void OnanswerButtonClicked(int index)

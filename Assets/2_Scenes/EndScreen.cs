@@ -4,7 +4,7 @@ using UnityEngine;
 public class EndScreen : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI finalScoreText;
-    [SerializeField] SocreKeeper scoreKeeper; // ScoreKeeper 타입으로 변경
+    [SerializeField] ScoreKeeper scoreKeeper; // ScoreKeeper 타입으로 변경
 
     public void ShowFinalScore()
     {
