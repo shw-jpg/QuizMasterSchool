@@ -217,5 +217,6 @@ public class Quiz : MonoBehaviour
         {
             obj.GetComponent<Button>().interactable = state;
         }
+
     }
 }

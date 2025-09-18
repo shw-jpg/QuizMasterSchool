@@ -221,4 +221,5 @@ public class ChatGPTClient : MonoBehaviour
         PlayerPrefs.SetString("OpenAI_API_Key", key);
         PlayerPrefs.Save();
     }
+
 }
