@@ -18,4 +18,5 @@ MonoBehaviour:
   - "2.\uD6C4\uB2E4\uB2E5(\uC815\uB2F5)"
   - "3.\uD30C\uB2E4\uB2E5"
   - "4.\uD6C4\uB354\uB355"
-  correctAnswerlndex: 1
+  correctAnswerIndex: 1
+  hint: "\uBE48\uAC12"

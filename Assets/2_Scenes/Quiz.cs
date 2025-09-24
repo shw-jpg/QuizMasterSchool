@@ -39,6 +39,8 @@ public class Quiz : MonoBehaviour
     bool isGenerateQuestions = false;
     [SerializeField] TextMeshProUGUI hintText;
 
+    [SerializeField] AppleSlotDisplay appleSlotDisplay;
+
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
@@ -193,10 +195,14 @@ public class Quiz : MonoBehaviour
             questionText.text = "정답입니다!";
             answerButtonArr[index].GetComponent<Image>().sprite = correctAnswerSprite;
             scoreKeeper.IncrementCorrectAnswers();
+
+            appleSlotDisplay.AddApple();
         }
         else
         {
             questionText.text = "틀렸습니다!" + currentQuestion.GetCorrectAnswer();
+
+            appleSlotDisplay.RemoveApple();
         }
         SetButtoState(false);
     }

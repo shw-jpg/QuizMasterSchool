@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class Timer : MonoBehaviour
@@ -10,6 +11,9 @@ public class Timer : MonoBehaviour
     [HideInInspector] public float fillAmount;
     [HideInInspector] public bool loadNextQuestion;
 
+    [Header("UIÇ¥½Ã")]
+    [SerializeField] TextMeshProUGUI timerText;
+
     private void Start()
     {
         time = problemTime;
@@ -20,6 +24,7 @@ public class Timer : MonoBehaviour
     {
         TimerCountDown();
         UpdateFillAmount();
+        UpdateTimerText();
     }
 
     private void UpdateFillAmount()
@@ -49,6 +54,13 @@ public class Timer : MonoBehaviour
                 loadNextQuestion = true;
             }
         }
+    }
+
+    private void UpdateTimerText()
+    {
+        int displayTime = Mathf.CeilToInt(time);
+
+        timerText.text = displayTime.ToString();
     }
 
     public void CancelTimer()
