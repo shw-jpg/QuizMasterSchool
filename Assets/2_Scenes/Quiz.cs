@@ -222,4 +222,15 @@ public class Quiz : MonoBehaviour
             obj.GetComponent<Button>().interactable = state;
         }
     }
+
+    public static class SelectedTopicHolder
+    {
+        // null 이면 선택 없음 → Quiz는 랜덤 토픽 사용
+        public static string SelectedTopic = null;
+
+        public static void Clear()
+        {
+            SelectedTopic = null;
+        }
+    }
 }
