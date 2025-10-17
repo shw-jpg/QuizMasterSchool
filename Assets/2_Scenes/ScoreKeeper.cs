@@ -2,17 +2,17 @@ using UnityEngine;
 
 public class ScoreKeeper : MonoBehaviour
 {
-    int correctAnswers = 0;
+    int currentScore = 0;
     int questionSeen = 0;
 
     public int GetCorrectAnswers()
     {
-        return correctAnswers;
+        return currentScore;
     }
 
     public void IncrementCorrectAnswers()
     {
-        correctAnswers++;
+        currentScore++;
     }
 
     public int GetQuestionSeen()
@@ -28,6 +28,11 @@ public class ScoreKeeper : MonoBehaviour
     public int CalculareScore()
     {
         if (questionSeen == 0) return 0;
-        return Mathf.RoundToInt((float)correctAnswers / questionSeen * 100);
+        return Mathf.RoundToInt((float)currentScore / questionSeen * 100);
+    }
+
+    public void AddScore(int score)
+    {
+        currentScore += score;
     }
 }

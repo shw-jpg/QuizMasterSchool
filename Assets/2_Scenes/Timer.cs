@@ -1,3 +1,4 @@
+using Microsoft.Unity.VisualStudio.Editor;
 using TMPro;
 using UnityEngine;
 
@@ -11,8 +12,11 @@ public class Timer : MonoBehaviour
     [HideInInspector] public float fillAmount;
     [HideInInspector] public bool loadNextQuestion;
 
+    // ... 기존 코드 생략 ...
+
     [Header("UI표시")]
     [SerializeField] TextMeshProUGUI timerText;
+    [SerializeField] private UnityEngine.UI.Image timerImage; // Image 타입을 UnityEngine.UI.Image로 변경
 
     private void Start()
     {
@@ -25,6 +29,7 @@ public class Timer : MonoBehaviour
         TimerCountDown();
         UpdateFillAmount();
         UpdateTimerText();
+        TimeColor();
     }
 
     private void UpdateFillAmount()
@@ -66,5 +71,23 @@ public class Timer : MonoBehaviour
     public void CancelTimer()
     {
         time = 0;
+    }
+
+    // ... 기존 코드 생략 ...
+
+    public void TimeColor()
+    {
+        if (time > 7f)
+        {
+            timerImage.color = Color.green;
+        }
+        else if (time > 3f)
+        {
+            timerImage.color = Color.yellow;
+        }
+        else
+        {
+            timerImage.color = Color.red;
+        }
     }
 }

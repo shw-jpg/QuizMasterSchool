@@ -3,23 +3,24 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class StartMenu : MonoBehaviour
+public class StartCanvas : MonoBehaviour
 {
     [SerializeField] private GameObject startCanvas;
-    [SerializeField] private Button[] categoryButtons; // 버튼 배열 (Inspector에 연결)
+    [SerializeField] private Button[] categoryButtons;
+
+    // 이동할 씬 이름을 하드코딩
+    private string targetSceneName = "QuizScene";
 
     private string[] topics = { "과학", "역사", "스포츠", "영화", "음악" };
 
     void Start()
     {
-        // 실행할 때 버튼 텍스트를 주제 이름으로 변경
         for (int i = 0; i < categoryButtons.Length && i < topics.Length; i++)
         {
             TextMeshProUGUI textComp = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
-            if (textComp != null)
-                textComp.text = topics[i];
+            if (textComp != null) textComp.text = topics[i];
 
-            int index = i; // 캡처 문제 방지
+            int index = i;
             categoryButtons[i].onClick.AddListener(() => SelectCategory(index));
         }
     }
@@ -31,9 +32,11 @@ public class StartMenu : MonoBehaviour
         if (startCanvas != null)
             startCanvas.SetActive(false);
 
-        SceneManager.LoadScene("QuizScene");
+        // Build Profiles 없이 씬 전환
+        SceneManager.LoadScene(targetSceneName);
     }
 
+    [System.Serializable]
     public static class QuizCategory
     {
         public static int selectedCategory = 0;

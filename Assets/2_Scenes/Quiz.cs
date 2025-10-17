@@ -185,18 +185,30 @@ public class Quiz : MonoBehaviour
         chooseAnswer = true;
         DisplaySolution(index);
         timer.CancelTimer();
-        scoreText.text = $"Score:{scoreKeeper.CalculareScore()}%";
+      
+        scoreText.text = "Score: " + scoreKeeper.CalculareScore().ToString();
     }
 
     private void DisplaySolution(int index)
     {
+        int scoreToAdd = 0;
+
         if (index == currentQuestion.GetCorrectAnswerIndex())
         {
             questionText.text = "정답입니다!";
             answerButtonArr[index].GetComponent<Image>().sprite = correctAnswerSprite;
             scoreKeeper.IncrementCorrectAnswers();
 
-            appleSlotDisplay.AddApple();
+            //기본 점수 1점
+            scoreToAdd += 1;
+
+            float remainingTimeRatio = timer.fillAmount;
+            if (remainingTimeRatio > 7f)
+                scoreToAdd += 3;
+            else if (remainingTimeRatio > 3f)
+                scoreToAdd += 1;
+
+                appleSlotDisplay.AddApple();
         }
         else
         {

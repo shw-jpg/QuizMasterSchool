@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static StartMenu;
+using static StartCanvas;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,9 +9,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Quiz quiz;
     [SerializeField] private EndScreen endScreen;
     [SerializeField] private GameObject losdingCanves;
-
     public ChatGPTClient chatClient;
-    private string[] currentQuestions;
+   
 
 
     void Awake()
@@ -33,13 +32,8 @@ public class GameManager : MonoBehaviour
     {
         //ShowQuizSceen();
         int category = QuizCategory.selectedCategory;
-        string topic = GetTopicName(QuizCategory.selectedCategory);
+        string topic = GetTopicName(category);
         chatClient.GenerateQuizQuestions(5, topic);
-
-        if (currentQuestions != null && currentQuestions.Length > 0)
-        {
-            Debug.Log("·£´ý ¹®Á¦: " + currentQuestions[Random.Range(0, currentQuestions.Length)]);
-        }
     }
 
     private string GetTopicName(int selectedCategory)
@@ -79,8 +73,8 @@ public class GameManager : MonoBehaviour
         losdingCanves.SetActive(true);
     }
 
-    public void OnReplayLevel()
+    public void ReplayLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

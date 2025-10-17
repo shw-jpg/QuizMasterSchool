@@ -5,6 +5,7 @@ public class Program : MonoBehaviour
     void Start()
     {
         Debug.Log("Hello World");
+
         Publisher publisher = new Publisher();
         publisher.msg += ResultProcess;
         publisher.msg += OtherProcess;
@@ -32,8 +33,7 @@ public class Publisher
 
     public void SendMessage(string text)
     {
-        Debug.Log($"ChatGPT API와 통신합니다.(1분 걸림)... {text}");
-
+        Debug.Log($"ChatGPT API와 통신합니다... {text}");
         msg?.Invoke(text);
     }
 }
