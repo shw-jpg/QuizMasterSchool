@@ -13,6 +13,10 @@ public class GameManager : MonoBehaviour
    
     public Timer timer;
 
+    [SerializeField] private GameObject startCanvas;
+    [SerializeField] private GameObject quizCanvas;
+    [SerializeField] private GameObject loadingCanvas;
+
     void Awake()
     {
         if (Instance == null)
@@ -50,6 +54,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SelectCategory(int categoryIndex)
+    {
+        QuizCategory.selectedCategory = categoryIndex;
+
+        startCanvas.SetActive(false);  
+        GameManager.Instance.ShowQuizScreen();  
+    }
 
     public void ShowQuizSceen()
     {
@@ -82,4 +93,31 @@ public class GameManager : MonoBehaviour
     {
         timer.Resumetimer();
     }
+
+    public void ShowStartScreen()
+    {
+        startCanvas.SetActive(true);
+        quizCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
+    }
+
+    public void ShowQuizScreen()
+    {
+        quizCanvas.SetActive(true);
+    }
+
+    public void ShowEndScreen()
+    {
+        startCanvas.SetActive(false);
+        quizCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
+    }
+
+    public void ShowLoadingScreen()
+    {
+        startCanvas.SetActive(false);
+        quizCanvas.SetActive(false);
+        loadingCanvas.SetActive(true);
+    }
+
 }

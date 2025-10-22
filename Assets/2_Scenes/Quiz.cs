@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using TMPro;
-using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,70 +35,85 @@ public class Quiz : MonoBehaviour
     [SerializeField] ChatGPTClient chatGPTClinet;
     [SerializeField] int questionCount = 3;
     [SerializeField] TextMeshProUGUI loadingText;
-
     bool isGenerateQuestions = false;
 
+    [Header("힌트")]
     [SerializeField] private Button hintButton;
-    [SerializeField] TextMeshProUGUI hintText;
-    [SerializeField] AppleSlotDisplay appleSlotDisplay;
+    [SerializeField] private TextMeshProUGUI hintText;
 
-    private string currentHint;
+    [Header("Apple Slot")]
+    [SerializeField] AppleSlotDisplay appleSlotDisplay;
 
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
         scoreKeeper = FindFirstObjectByType<ScoreKeeper>();
+
         chatGPTClinet.quizGenerateHandler += QuizGeneratedHandler;
+
+        hintButton.onClick.AddListener(ShowHint);
+        hintText.gameObject.SetActive(false); // 처음에는 숨김
 
         if (questions.Count <= 0)
         {
-            GenerateQestionslfNeeded();
+            GenerateQuestionsIfNeeded();
         }
         else
         {
             InitializeProgressBar();
+            GetNextQuestion();
         }
-
-        hintButton.onClick.AddListener(ShowHint);
-        hintText.gameObject.SetActive(false);
     }
 
-    private void GenerateQestionslfNeeded()
+    private void GenerateQuestionsIfNeeded()
     {
         if (isGenerateQuestions) return;
-
         isGenerateQuestions = true;
+
         GameManager.Instance.ShowLoadingSceen();
 
-        string topicToUse = GetTrendingTopic();
+        string topicToUse = StartCanvas.QuizCategory.selectedCategory >= 0
+            ? GetTopicName(StartCanvas.QuizCategory.selectedCategory)
+            : GetTrendingTopic();
+
         chatGPTClinet.GenerateQuizQuestions(questionCount, topicToUse);
-        Debug.Log($"GenerateQestionslfNeeded {topicToUse}");
+        Debug.Log($"GenerateQuestionsIfNeeded {topicToUse}");
     }
 
     private string GetTrendingTopic()
     {
-        string[] topics = new string[] { "과학", "역사", "음악", "영화", "스포츠",
-            "기술","문학","지리","예술", "동물","음식"};
-        int randomlndx = UnityEngine.Random.Range(0, topics.Length);
-        return topics[randomlndx];
+        string[] topics = { "과학", "역사", "음악", "영화", "스포츠", "기술", "문학", "지리", "예술", "동물", "음식" };
+        int randomIndex = UnityEngine.Random.Range(0, topics.Length);
+        return topics[randomIndex];
+    }
+
+    private string GetTopicName(int selectedCategory)
+    {
+        switch (selectedCategory)
+        {
+            case 0: return "과학";
+            case 1: return "역사";
+            case 2: return "스포츠";
+            case 3: return "영화";
+            case 4: return "음악";
+            default: return "일반상식";
+        }
     }
 
     void QuizGeneratedHandler(List<QuestionSO> generatedQuestions)
     {
         isGenerateQuestions = false;
 
-        if(generatedQuestions == null || generatedQuestions.Count == 0)
+        if (generatedQuestions == null || generatedQuestions.Count == 0)
         {
-            Debug.LogError("문제 생성에 실패했습니다.");
-            loadingText.text = "문제 생성에 실패했습니다.\n 인터넷 연결을 확인하고 다시 시도하세요.";
+            loadingText.text = "문제 생성 실패!\n인터넷 연결 확인 후 재시도.";
             return;
         }
 
-        generatedQuestions.RemoveAll(q => q == null);
-
         questions.AddRange(generatedQuestions);
-        progressBar.maxValue += questions.Count;
+        progressBar.maxValue = questions.Count;
 
+        InitializeProgressBar();
         GetNextQuestion();
     }
 
@@ -109,78 +123,28 @@ public class Quiz : MonoBehaviour
         progressBar.value = 0;
     }
 
-    private void Update()
-    {
-        //Timer 이미지 업데이트
-        if (timer.isProblemTime)
-            timerImage.sprite = problemTimerSprite;
-        else
-            timerImage.sprite = solutionTimerSprite;
-        timerImage.fillAmount = timer.fillAmount;
-
-        //다음 질문 불러오기
-        if (timer.loadNextQuestion)
-        {
-            if (questions.Count == 0)
-            {
-                GenerateQestionslfNeeded();
-                //GameManager.Instance.ShowEndSceen();
-            }
-            else
-            {
-                //timer.loadNextQuestion = false;
-                GetNextQuestion();
-            }
-        }
-
-        //SolutionTime이고 답을 선택하지 않았을 때
-        if (timer.isProblemTime == false && chooseAnswer == false)
-        {
-            DisplaySolution(-1);
-        }
-
-    }
-
     private void GetNextQuestion()
     {
-        
         if (questions.Count <= 0)
         {
             Debug.Log("남은 문제가 없습니다.");
             return;
         }
 
-        timer.loadNextQuestion = false;
-
-        GameManager.Instance.ShowQuizSceen();
+        currentQuestion = questions[0]; // 문제 고정
         chooseAnswer = false;
-        SetButtoState(true);
-        SetDefsultButtonSprites();
-        GetRandomQuestion();
-        OnDisplayQuestion();
-        scoreKeeper.IncrementCorrectAnswers();
+        SetButtonState(true);
+        SetDefaultButtonSprites();
+        DisplayQuestion();
         progressBar.value++;
     }
 
-    private void GetRandomQuestion()
+    private void DisplayQuestion()
     {
-        int randomlndex = UnityEngine.Random.Range(0, questions.Count);
-        currentQuestion = questions[randomlndex];
+        if (currentQuestion == null) return;
 
-        questions.RemoveAt(randomlndex);
-    }
-
-    private void OnDisplayQuestion()
-    {
         questionText.text = currentQuestion.GetQuestion();
-        currentHint = currentQuestion.GetHint();
-        hintText.gameObject.SetActive(false);
-
-        if (currentQuestion == null)
-        {
-            Debug.LogError("currentQuestion is null");
-            return;
-        }
+        hintText.gameObject.SetActive(false); // 힌트 숨김
 
         for (int i = 0; i < answerButtonArr.Length; i++)
         {
@@ -188,55 +152,37 @@ public class Quiz : MonoBehaviour
         }
     }
 
-    void ShowHint()
-    {
-        hintText.gameObject.SetActive(true);
-        hintText.text = "힌트: " + currentHint;
-    }
-
-    public void OnanswerButtonClicked(int index)
+    public void OnAnswerButtonClicked(int index)
     {
         chooseAnswer = true;
         DisplaySolution(index);
         timer.CancelTimer();
 
-        scoreText.text = $"Score:{scoreKeeper.CalculareScore()}점";
+        scoreText.text = $"Score:{scoreKeeper.GetCurrentScore()}점";
     }
 
     private void DisplaySolution(int index)
     {
-        int scoreToAdd = 0;
-
         if (index == currentQuestion.GetCorrectAnswerIndex())
         {
             questionText.text = "정답입니다!";
             answerButtonArr[index].GetComponent<Image>().sprite = correctAnswerSprite;
+
+
+
             scoreKeeper.IncrementCorrectAnswers();
-
-            //기본 점수 1점
-            scoreToAdd += 1;
-
-            float remainingTimeRatio = timer.fillAmount;
-
-            if (remainingTimeRatio > 0.7f)
-                scoreToAdd += 3;
-            else if (remainingTimeRatio > 0.3f)
-                scoreToAdd += 1;
-            else
-                scoreToAdd += 0;
-
             appleSlotDisplay.AddApple();
         }
         else
         {
-            questionText.text = "틀렸습니다!" + currentQuestion.GetCorrectAnswer();
-
+            questionText.text = "틀렸습니다! 정답: " + currentQuestion.GetCorrectAnswer();
             appleSlotDisplay.RemoveApple();
         }
-        SetButtoState(false);
+
+        SetButtonState(false);
     }
 
-    private void SetDefsultButtonSprites()
+    private void SetDefaultButtonSprites()
     {
         foreach (GameObject obj in answerButtonArr)
         {
@@ -244,7 +190,7 @@ public class Quiz : MonoBehaviour
         }
     }
 
-    private void SetButtoState(bool state)
+    private void SetButtonState(bool state)
     {
         foreach (GameObject obj in answerButtonArr)
         {
@@ -252,14 +198,9 @@ public class Quiz : MonoBehaviour
         }
     }
 
-    public static class SelectedTopicHolder
+    private void ShowHint()
     {
-        // null 이면 선택 없음 → Quiz는 랜덤 토픽 사용
-        public static string SelectedTopic = null;
-
-        public static void Clear()
-        {
-            SelectedTopic = null;
-        }
+        hintText.text = "힌트: " + currentQuestion.GetHint();
+        hintText.gameObject.SetActive(true);
     }
 }

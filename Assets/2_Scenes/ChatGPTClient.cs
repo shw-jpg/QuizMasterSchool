@@ -85,6 +85,12 @@ public class ChatGPTClient : MonoBehaviour
         return "";
     }
 
+    private string GetTrendingTopic()
+    {
+        string[] topics = { "과학", "역사", "스포츠", "영화", "음악", "문학" };
+        return topics[UnityEngine.Random.Range(0, topics.Length)];
+    }
+
     public void GenerateQuizQuestions(int count = 3, string topic = "일반상식")
     {
         StartCoroutine(RequestQuizQuestions(count, topic));
@@ -214,6 +220,8 @@ public class ChatGPTClient : MonoBehaviour
 
         return questionSOs;
     }
+
+   
 
     public void SetApiKey(string key)
     {
