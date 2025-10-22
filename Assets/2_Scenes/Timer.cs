@@ -16,7 +16,9 @@ public class Timer : MonoBehaviour
 
     [Header("UI표시")]
     [SerializeField] TextMeshProUGUI timerText;
-    [SerializeField] private UnityEngine.UI.Image timerImage; // Image 타입을 UnityEngine.UI.Image로 변경
+    [SerializeField] private UnityEngine.UI.Image timerImage;
+
+    private bool isPaused = true;
 
     private void Start()
     {
@@ -26,6 +28,7 @@ public class Timer : MonoBehaviour
 
     private void Update()
     {
+        if (isPaused) return;
         TimerCountDown();
         UpdateFillAmount();
         UpdateTimerText();
@@ -41,6 +44,15 @@ public class Timer : MonoBehaviour
             fillAmount = time / solutionTime;
     }
 
+    public void Resumetimer()
+    {
+        isPaused = false;
+    }
+
+    public void Pausetimer()
+    {
+        isPaused = true;
+    }
 
     private void TimerCountDown()
     {

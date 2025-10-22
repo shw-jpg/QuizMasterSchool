@@ -5,14 +5,19 @@ public class ScoreKeeper : MonoBehaviour
     int currentScore = 0;
     int questionSeen = 0;
 
-    public int GetCorrectAnswers()
+    public void AddScore(int score)
+    {
+        currentScore += score;
+    }
+
+    public int GetCurrentScore()
     {
         return currentScore;
     }
 
-    public void IncrementCorrectAnswers()
+    public int GetCorrectAnswers()
     {
-        currentScore++;
+        return currentScore;
     }
 
     public int GetQuestionSeen()
@@ -20,19 +25,14 @@ public class ScoreKeeper : MonoBehaviour
         return questionSeen;
     }
 
-    public void IncrementQuestionSeen()
+    public void IncrementCorrectAnswers()
     {
-        questionSeen++;
+        currentScore++;
     }
 
     public int CalculareScore()
     {
         if (questionSeen == 0) return 0;
         return Mathf.RoundToInt((float)currentScore / questionSeen * 100);
-    }
-
-    public void AddScore(int score)
-    {
-        currentScore += score;
     }
 }

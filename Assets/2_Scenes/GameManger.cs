@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject losdingCanves;
     public ChatGPTClient chatClient;
    
-
+    public Timer timer;
 
     void Awake()
     {
@@ -76,5 +76,10 @@ public class GameManager : MonoBehaviour
     public void ReplayLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void StartGama()
+    {
+        timer.Resumetimer();
     }
 }

@@ -36,10 +36,14 @@ public class Quiz : MonoBehaviour
     [SerializeField] ChatGPTClient chatGPTClinet;
     [SerializeField] int questionCount = 3;
     [SerializeField] TextMeshProUGUI loadingText;
-    bool isGenerateQuestions = false;
-    [SerializeField] TextMeshProUGUI hintText;
 
+    bool isGenerateQuestions = false;
+
+    [SerializeField] private Button hintButton;
+    [SerializeField] TextMeshProUGUI hintText;
     [SerializeField] AppleSlotDisplay appleSlotDisplay;
+
+    private string currentHint;
 
     void Start()
     {
@@ -55,6 +59,9 @@ public class Quiz : MonoBehaviour
         {
             InitializeProgressBar();
         }
+
+        hintButton.onClick.AddListener(ShowHint);
+        hintText.gameObject.SetActive(false);
     }
 
     private void GenerateQestionslfNeeded()
@@ -151,7 +158,7 @@ public class Quiz : MonoBehaviour
         SetDefsultButtonSprites();
         GetRandomQuestion();
         OnDisplayQuestion();
-        scoreKeeper.IncrementQuestionSeen();
+        scoreKeeper.IncrementCorrectAnswers();
         progressBar.value++;
     }
 
@@ -166,7 +173,8 @@ public class Quiz : MonoBehaviour
     private void OnDisplayQuestion()
     {
         questionText.text = currentQuestion.GetQuestion();
-        hintText.text = "힌트: " + currentQuestion.GetHint();
+        currentHint = currentQuestion.GetHint();
+        hintText.gameObject.SetActive(false);
 
         if (currentQuestion == null)
         {
@@ -180,13 +188,19 @@ public class Quiz : MonoBehaviour
         }
     }
 
+    void ShowHint()
+    {
+        hintText.gameObject.SetActive(true);
+        hintText.text = "힌트: " + currentHint;
+    }
+
     public void OnanswerButtonClicked(int index)
     {
         chooseAnswer = true;
         DisplaySolution(index);
         timer.CancelTimer();
-      
-        scoreText.text = "Score: " + scoreKeeper.CalculareScore().ToString();
+
+        scoreText.text = $"Score:{scoreKeeper.CalculareScore()}점";
     }
 
     private void DisplaySolution(int index)
@@ -203,12 +217,15 @@ public class Quiz : MonoBehaviour
             scoreToAdd += 1;
 
             float remainingTimeRatio = timer.fillAmount;
-            if (remainingTimeRatio > 7f)
-                scoreToAdd += 3;
-            else if (remainingTimeRatio > 3f)
-                scoreToAdd += 1;
 
-                appleSlotDisplay.AddApple();
+            if (remainingTimeRatio > 0.7f)
+                scoreToAdd += 3;
+            else if (remainingTimeRatio > 0.3f)
+                scoreToAdd += 1;
+            else
+                scoreToAdd += 0;
+
+            appleSlotDisplay.AddApple();
         }
         else
         {
