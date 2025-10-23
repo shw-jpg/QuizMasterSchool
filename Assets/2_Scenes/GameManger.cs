@@ -1,123 +1,58 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static StartCanvas;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField] private Quiz quiz;
+    [Header("Canvases")]
+    [SerializeField] private GameObject lobbyCanvas;
+    [SerializeField] private Quiz quizCanvas;
     [SerializeField] private EndScreen endScreen;
-    [SerializeField] private GameObject losdingCanves;
-    public ChatGPTClient chatClient;
-   
-    public Timer timer;
-
-    [SerializeField] private GameObject startCanvas;
-    [SerializeField] private GameObject quizCanvas;
     [SerializeField] private GameObject loadingCanvas;
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            //DontDestroyOnLoad(gameObject);
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
+        if (Instance == null) Instance = this;
+        else if (Instance != this) Destroy(gameObject);
     }
 
-    
 
-    void Start()
+
+    // 로비 화면 표시
+    public void ShowLobby()
     {
-        //ShowQuizSceen();
-        int category = QuizCategory.selectedCategory;
-        string topic = GetTopicName(category);
-        chatClient.GenerateQuizQuestions(5, topic);
-    }
-
-    private string GetTopicName(int selectedCategory)
-    {
-        switch (selectedCategory)
-        {
-            case 0: return "과학";
-            case 1: return "역사";
-            case 2: return "스포츠";
-            case 3: return "영화";
-            default:
-                string[] topics = { "과학", "역사", "스포츠", "영화", "음악", "문학" };
-                return topics[UnityEngine.Random.Range(0, topics.Length)];
-        }
-    }
-
-    public void SelectCategory(int categoryIndex)
-    {
-        QuizCategory.selectedCategory = categoryIndex;
-
-        startCanvas.SetActive(false);  
-        GameManager.Instance.ShowQuizScreen();  
-    }
-
-    public void ShowQuizSceen()
-    {
-        quiz.gameObject.SetActive(true);
+        lobbyCanvas.SetActive(true);  // 로비 켜기
+        quizCanvas.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(false);
-        losdingCanves.SetActive(false);
-    }
-
-    public void ShowEndSceen()
-    {
-        quiz.gameObject.SetActive(false);
-        endScreen.gameObject.SetActive(true);
-        endScreen.ShowFinalScore();
-        losdingCanves.SetActive(false);
-    }
-
-    public void ShowLoadingSceen()
-    {
-        quiz.gameObject.SetActive(false);
-        endScreen.gameObject.SetActive(false);
-        losdingCanves.SetActive(true);
-    }
-
-    public void ReplayLevel()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-    public void StartGama()
-    {
-        timer.Resumetimer();
-    }
-
-    public void ShowStartScreen()
-    {
-        startCanvas.SetActive(true);
-        quizCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
     }
 
-    public void ShowQuizScreen()
+    // 퀴즈 화면 표시
+    public void ShowQuiz()
     {
-        quizCanvas.SetActive(true);
+        lobbyCanvas.SetActive(false);
+        quizCanvas.gameObject.SetActive(true);
+        endScreen.gameObject.SetActive(false);
+        loadingCanvas.SetActive(false);
+
+        quizCanvas.StartQuiz(); // 퀴즈 시작
     }
 
+    // EndScreen 표시
     public void ShowEndScreen()
     {
-        startCanvas.SetActive(false);
-        quizCanvas.SetActive(false);
+        lobbyCanvas.SetActive(false);
+        quizCanvas.gameObject.SetActive(false);
+        endScreen.gameObject.SetActive(true);
         loadingCanvas.SetActive(false);
+
+        endScreen.ShowFinalScore();
     }
 
-    public void ShowLoadingScreen()
+    // 로비로 돌아가기
+    public void ReturnToLobby()
     {
-        startCanvas.SetActive(false);
-        quizCanvas.SetActive(false);
-        loadingCanvas.SetActive(true);
+        ShowLobby();
     }
-
 }
