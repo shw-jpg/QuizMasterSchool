@@ -1,3 +1,4 @@
+using System.Collections;                  // ← 추가
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,7 +6,7 @@ using UnityEngine.UI;
 public class EndScreen : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI finalScoreText;
-    [SerializeField] ScoreKeeper scoreKeeper; // ScoreKeeper 타입으로 변경
+    [SerializeField] ScoreKeeper scoreKeeper;
     [SerializeField] Button replayButton;
 
     void Start()
@@ -21,7 +22,13 @@ public class EndScreen : MonoBehaviour
 
     private void OnReplayButtonClicked()
     {
-        GameManager.Instance.ReturnToLobby(); // 로비로 이동
-        scoreKeeper.ResetScore(); // 점수 초기화
+        StartCoroutine(RestartSequence());
+    }
+
+    private IEnumerator RestartSequence()
+    {
+        scoreKeeper.ResetScore();
+        GameManager.Instance.ReturnToStartCanvas(); // 로딩→StartCanvas
+        yield break;
     }
 }

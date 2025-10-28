@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -12,17 +13,12 @@ public class Quiz : MonoBehaviour
 
     [Header("보기")]
     [SerializeField] GameObject[] answerButtonArr;
-
-    [Header("버튼 색깔")]
     [SerializeField] Sprite defaultAnswerSprite;
     [SerializeField] Sprite correctAnswerSprite;
+    [SerializeField] Sprite selectedAnswerSprite;
 
     [Header("Timer")]
-    [SerializeField] Image timerImage;
-    [SerializeField] Sprite problemTimerSprite;
-    [SerializeField] Sprite solutionTimerSprite;
     Timer timer;
-    bool chooseAnswer = false;
 
     [Header("점수")]
     [SerializeField] TextMeshProUGUI scoreText;
@@ -44,28 +40,17 @@ public class Quiz : MonoBehaviour
     [Header("Apple Slot")]
     [SerializeField] AppleSlotDisplay appleSlotDisplay;
 
-    [Header("종료 UI")]
-    [SerializeField] GameObject endPanel;
-    [SerializeField] Button restartButton;
-
     void Start()
     {
         timer = FindFirstObjectByType<Timer>();
         scoreKeeper = FindFirstObjectByType<ScoreKeeper>();
-
         chatGPTClinet.quizGenerateHandler += QuizGeneratedHandler;
 
         hintButton.onClick.AddListener(ShowHint);
         hintText.gameObject.SetActive(false);
 
-        restartButton.onClick.AddListener(RestartQuiz);
-
-        endPanel.SetActive(false); // 시작 시 종료 UI 숨김
-
         if (questions.Count <= 0)
-        {
             GenerateQuestionsIfNeeded();
-        }
         else
         {
             InitializeProgressBar();
@@ -78,8 +63,6 @@ public class Quiz : MonoBehaviour
         if (isGenerateQuestions) return;
         isGenerateQuestions = true;
 
-        GameManager.Instance.ShowQuiz(); // 또는 GameManager.Instance.ShowLobby();로 변경
-
         string topicToUse = StartCanvas.QuizCategory.selectedCategory >= 0
             ? GetTopicName(StartCanvas.QuizCategory.selectedCategory)
             : GetTrendingTopic();
@@ -90,8 +73,7 @@ public class Quiz : MonoBehaviour
     private string GetTrendingTopic()
     {
         string[] topics = { "과학", "역사", "스포츠", "영화", "음악", "문학", "기술", "지리", "예술", "동물", "음식" };
-        int randomIndex = Random.Range(0, topics.Length);
-        return topics[randomIndex];
+        return topics[Random.Range(0, topics.Length)];
     }
 
     private string GetTopicName(int selectedCategory)
@@ -109,17 +91,19 @@ public class Quiz : MonoBehaviour
 
     public void StartQuiz(int selectedCategory)
     {
-        Debug.Log("선택한 카테고리: " + selectedCategory);
+        Debug.Log($"선택된 카테고리: {selectedCategory}");
         StartCanvas.QuizCategory.selectedCategory = selectedCategory;
 
-        // 문제 생성 및 첫 질문 불러오기
-        if (questions.Count <= 0)
-            GenerateQuestionsIfNeeded();
-        else
-        {
-            InitializeProgressBar();
-            GetNextQuestion();
-        }
+        questions.Clear();
+        progressBar.value = 0;
+
+        GenerateQuestionsForCategory(selectedCategory);
+    }
+
+    private void GenerateQuestionsForCategory(int selectedCategory)
+    {
+        string topic = GetTopicName(selectedCategory);
+        chatGPTClinet.GenerateQuizQuestions(questionCount, topic);
     }
 
     void QuizGeneratedHandler(List<QuestionSO> generatedQuestions)
@@ -133,8 +117,6 @@ public class Quiz : MonoBehaviour
         }
 
         questions.AddRange(generatedQuestions);
-        progressBar.maxValue = questions.Count;
-
         InitializeProgressBar();
         GetNextQuestion();
     }
@@ -149,15 +131,13 @@ public class Quiz : MonoBehaviour
     {
         if (questions.Count <= 0)
         {
-            OnAllQuestionsFinished();
-            ShowEndPanel();
+            GameManager.Instance.ShowEndScreen();
             return;
         }
 
         currentQuestion = questions[0];
         questions.RemoveAt(0);
 
-        chooseAnswer = false;
         SetButtonState(true);
         SetDefaultButtonSprites();
         DisplayQuestion();
@@ -172,20 +152,21 @@ public class Quiz : MonoBehaviour
         hintText.gameObject.SetActive(false);
 
         for (int i = 0; i < answerButtonArr.Length; i++)
-        {
             answerButtonArr[i].GetComponentInChildren<TextMeshProUGUI>().text = currentQuestion.Getanswer(i);
-        }
+
+        timer.StartProblemPhase();  // 10초 타이머 시작
     }
 
     public void OnAnswerButtonClicked(int index)
     {
-        chooseAnswer = true;
+        int remain = timer.GetRemainingWholeSeconds(); // 남은 초
+
         DisplaySolution(index);
         timer.CancelTimer();
-        scoreText.text = $"Score:{scoreKeeper.GetCurrentScore()}점";
+        timer.Pausetimer();
 
-        // 다음 문제 호출
-        Invoke(nameof(GetNextQuestion), 1.0f); // 1초 후 다음 문제
+        scoreText.text = $"Score:{scoreKeeper.GetCurrentScore()}점";
+        Invoke(nameof(GetNextQuestion), 1.0f);
     }
 
     private void DisplaySolution(int index)
@@ -193,79 +174,71 @@ public class Quiz : MonoBehaviour
         if (index == currentQuestion.GetCorrectAnswerIndex())
         {
             questionText.text = "정답입니다!";
-            answerButtonArr[index].GetComponent<Image>().sprite = correctAnswerSprite;
+
+            // 정답 버튼을 주황색으로 변경
+            answerButtonArr[index].GetComponent<Image>().sprite = selectedAnswerSprite;
+
             scoreKeeper.IncrementCorrectAnswers();
+
+            int bonus = timer.GetRemainingWholeSeconds();
+            scoreKeeper.AddScore(bonus);
+
             appleSlotDisplay.AddApple();
         }
         else
         {
             questionText.text = "틀렸습니다! 정답: " + currentQuestion.GetCorrectAnswer();
+
+            // 정답 버튼 찾아서 주황색 표시
+            int correct = currentQuestion.GetCorrectAnswerIndex();
+            answerButtonArr[correct].GetComponent<Image>().sprite = selectedAnswerSprite;
+
             appleSlotDisplay.RemoveApple();
         }
 
         SetButtonState(false);
+        timer.StartSolutionPhase(); // 정답 표시 시간 유지
     }
 
     private void SetDefaultButtonSprites()
     {
         foreach (GameObject obj in answerButtonArr)
-        {
             obj.GetComponent<Image>().sprite = defaultAnswerSprite;
-        }
     }
 
     private void SetButtonState(bool state)
     {
         foreach (GameObject obj in answerButtonArr)
-        {
             obj.GetComponent<Button>().interactable = state;
-        }
-    }
-
-    private void ShowHint()
-    {
-        hintText.text = "힌트: " + currentQuestion.GetHint();
-        hintText.gameObject.SetActive(true);
-    }
-
-    private void ShowEndPanel()
-    {
-        endPanel.SetActive(true);
-    }
-
-    private void RestartQuiz()
-    {
-        // 사과, 점수, 진행바 초기화
-        appleSlotDisplay.ResetApples();
-        scoreKeeper = FindFirstObjectByType<ScoreKeeper>();
-        scoreKeeper.GetCurrentScore();
-
-        progressBar.value = 0;
-        endPanel.SetActive(false);
-
-        GameManager.Instance.ShowLobby(); // 로비 화면으로 돌아가기
-    }
-
-    public void StartQuiz()
-    {
-        if (questions.Count <= 0)
-        {
-            GenerateQuestionsIfNeeded();
-        }
-        else
-        {
-            InitializeProgressBar();
-            GetNextQuestion();
-        }
     }
 
     private void OnAllQuestionsFinished()
     {
-        GameManager.Instance.ShowEndScreen();
+        StartCoroutine(ShowLoadingThenEnd());
     }
 
-    public int GetScore()
+    private IEnumerator ShowLoadingThenEnd()
     {
-        return scoreKeeper.GetCurrentScore();
+        GameManager.Instance.ShowEndScreen();
+        yield return null;
+    }
+
+    private void ShowHint()
+    {
+        string h = currentQuestion.GetHint();
+        if (string.IsNullOrEmpty(h) || h == "빈값")
+        {
+            string ans = currentQuestion.GetCorrectAnswer();
+            string fallback = ans.Length > 1 ? $"{ans[0]}… ({ans.Length}글자)" : ans;
+            h = $"정답 힌트: {fallback}";
+        }
+
+        hintText.text = h;
+        hintText.gameObject.SetActive(true);
+    }
+
+    public void StartQuiz()
+    {
+        StartQuiz(0);
     }
 }

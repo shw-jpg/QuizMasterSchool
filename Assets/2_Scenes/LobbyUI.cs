@@ -3,15 +3,24 @@ using UnityEngine.UI;
 
 public class LobbyUI : MonoBehaviour
 {
-    [SerializeField] private Button startButton;
+    [SerializeField] private GameObject lobbyCanvas;   // 로비 캔버스
+    [SerializeField] private GameObject startCanvas;   // 스타트 캔버스
+    [SerializeField] private Button startButton;       // 시작 버튼
 
     void Start()
     {
-        startButton.onClick.AddListener(OnStartButtonClicked);
+        // 시작 버튼 클릭 시 ShowStartCanvas 실행
+        startButton.onClick.AddListener(ShowStartCanvas);
     }
 
-    private void OnStartButtonClicked()
+    private void ShowStartCanvas()
     {
-        GameManager.Instance.ShowLobby();
+        if (lobbyCanvas != null)
+            lobbyCanvas.SetActive(false);
+
+        if (startCanvas != null)
+            startCanvas.SetActive(true);
+
+        Debug.Log("로비 종료 → Start Canvas 활성화");
     }
 }

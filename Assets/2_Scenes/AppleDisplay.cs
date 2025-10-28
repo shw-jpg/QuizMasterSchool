@@ -1,55 +1,72 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AppleSlotDisplay : MonoBehaviour
 {
-    [SerializeField] GameObject applePrefab;   // 사과 아이콘 프리팹 (사과.png)
-    [SerializeField] Transform[] slots;        // 슬롯 위치 5개 (Inspector에서 채워줌)
+    [SerializeField] GameObject applePrefab;   // 사과 프리팹
+    [SerializeField] Transform[] slots;        // 슬롯 5개 (사각형 영역 내부)
 
     private List<GameObject> filledApples = new List<GameObject>();
 
-    // 정답 맞췄을 때 → 사과 추가
-    public void AddApple()
+    void Start()
     {
-        if (filledApples.Count < slots.Length)
-        {
-            Transform slot = slots[filledApples.Count];
-            GameObject apple = Instantiate(applePrefab, slot); // slot을 부모로 생성
+        // 시작 시 5개 사과 생성
+        ResetApples();
+        CreateAllApples();
+    }
 
-            // 위치/크기 초기화
+    // 처음부터 5개 채우기
+    private void CreateAllApples()
+    {
+        for (int i = 0; i < slots.Length; i++)
+        {
+            Transform slot = slots[i];
+            GameObject apple = Instantiate(applePrefab, slot);
+
             RectTransform rt = apple.GetComponent<RectTransform>();
             if (rt != null)
             {
-                rt.anchorMin = new Vector2(0.5f, 0.5f);
-                rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.pivot = new Vector2(0.5f, 0.5f);
-
-                rt.anchoredPosition = Vector2.zero;   // 슬롯 중앙에 위치
-                rt.localScale = Vector3.one;          // 크기 초기화
+                rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.anchoredPosition = Vector2.zero;
+                rt.localScale = Vector3.one;
             }
 
             filledApples.Add(apple);
         }
     }
 
-    // 오답 → 마지막 사과 제거
-    public void RemoveApple()
+    // 정답 → 사과 밝게(초기 상태 유지)
+    public void AddApple()
     {
-        if (filledApples.Count > 0)
+        foreach (var apple in filledApples)
         {
-            GameObject lastApple = filledApples[filledApples.Count - 1];
-            filledApples.RemoveAt(filledApples.Count - 1);
-            Destroy(lastApple);
+            Image img = apple.GetComponent<Image>();
+            if (img != null)
+                img.color = Color.white;
         }
     }
 
-    // 게임 다시 시작 시 초기화
+    // 오답 → 사과 어둡게
+    public void RemoveApple()
+    {
+        foreach (var apple in filledApples)
+        {
+            Image img = apple.GetComponent<Image>();
+            if (img != null)
+            {
+                // 점점 어둡게 (밝기 70%)
+                img.color = new Color(0.3f, 0.3f, 0.3f);
+            }
+        }
+    }
+
+    // 전체 리셋
     public void ResetApples()
     {
         foreach (GameObject apple in filledApples)
-        {
             Destroy(apple);
-        }
+
         filledApples.Clear();
     }
 }
