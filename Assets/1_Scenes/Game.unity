@@ -166,8 +166,6 @@ MonoBehaviour:
   problemTime: 10
   solutionTime: 3
   isProblemTime: 1
-  fillAmount: 0
-  loadNextQuestion: 0
   timerText: {fileID: 1864626080}
   timerImage: {fileID: 813556760}
 --- !u!1 &140895011
@@ -428,7 +426,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnanswerButtonClicked
+      value: OnAnswerButtonClicked
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -967,8 +965,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1572,7 +1570,7 @@ GameObject:
   - component: {fileID: 582299056}
   - component: {fileID: 582299055}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1593,10 +1591,10 @@ RectTransform:
   - {fileID: 343114111}
   m_Father: {fileID: 1406288808}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 300, y: -180}
-  m_SizeDelta: {x: 600, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &582299055
 MonoBehaviour:
@@ -1674,8 +1672,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 2849139487704622642, guid: fbc008e3f45451246bec7a409f3a132e, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2211,7 +2209,7 @@ GameObject:
   - component: {fileID: 667975781}
   - component: {fileID: 667975780}
   m_Layer: 5
-  m_Name: Button
+  m_Name: StartButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2232,10 +2230,10 @@ RectTransform:
   - {fileID: 1304749854}
   m_Father: {fileID: 1406288808}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 300, y: -50}
-  m_SizeDelta: {x: 600, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &667975780
 MonoBehaviour:
@@ -2281,13 +2279,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: ed037b34a2e58534f8cf77682755590d, type: 3}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 932225868}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2313,8 +2311,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 6273154578797183431, guid: 351715d90468f6347b762447ff883d48, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2414,10 +2412,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: 395e92d36ea196449ba6cb77f96acbdf, type: 3}
-        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
-        m_MethodName: set_name
-        m_Mode: 5
+      - m_Target: {fileID: 932225868}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ShowQuiz
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3050,10 +3048,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: 395e92d36ea196449ba6cb77f96acbdf, type: 3}
-        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
-        m_MethodName: set_name
-        m_Mode: 5
+      - m_Target: {fileID: 932225868}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ShowQuiz
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3516,7 +3514,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnanswerButtonClicked
+      value: OnAnswerButtonClicked
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -3959,7 +3957,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnanswerButtonClicked
+      value: OnAnswerButtonClicked
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -4274,8 +4272,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4570,10 +4568,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: 395e92d36ea196449ba6cb77f96acbdf, type: 3}
-        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
-        m_MethodName: set_name
-        m_Mode: 5
+      - m_Target: {fileID: 932225868}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ShowQuiz
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5112,10 +5110,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: ed037b34a2e58534f8cf77682755590d, type: 3}
-        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
-        m_MethodName: 
-        m_Mode: 5
+      - m_Target: {fileID: 932225868}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ShowQuiz
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5370,9 +5368,7 @@ MonoBehaviour:
   - {fileID: 2057589240}
   defaultAnswerSprite: {fileID: -2421234149185767044, guid: d35bcec9d938d1b4ea570b740bea1b25, type: 3}
   correctAnswerSprite: {fileID: -4659264650518790821, guid: 7bcdbe82b92fac14f89a70b7939cfe79, type: 3}
-  timerImage: {fileID: 813556760}
-  problemTimerSprite: {fileID: 801340330791846111, guid: c1fbc6489b6776742b16f4cde368efdf, type: 3}
-  solutionTimerSprite: {fileID: -5384725055999689231, guid: 7a0367747b46c12488cf8482ffc1aada, type: 3}
+  selectedAnswerSprite: {fileID: 0}
   scoreText: {fileID: 310656662}
   progressBar: {fileID: 1722746626}
   chatGPTClinet: {fileID: 1145773222}
@@ -5381,8 +5377,6 @@ MonoBehaviour:
   hintButton: {fileID: 951995664}
   hintText: {fileID: 140895014}
   appleSlotDisplay: {fileID: 1884548794}
-  endPanel: {fileID: 1868528290}
-  restartButton: {fileID: 292455618}
 --- !u!1 &1636126271
 GameObject:
   m_ObjectHideFlags: 0
@@ -5635,11 +5629,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 395e92d36ea196449ba6cb77f96acbdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startCanvas: {fileID: 1674462080}
   categoryButtons:
   - {fileID: 1555284473}
   - {fileID: 1372587858}
   - {fileID: 854251789}
   - {fileID: 704391479}
+  lobbyCanvas: {fileID: 2100688297}
+  quizManager: {fileID: 1598487928}
 --- !u!1 &1722746624
 GameObject:
   m_ObjectHideFlags: 0
@@ -6647,7 +6644,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2100688299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6782,6 +6779,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c546d7491e32d4faad26b484ea30da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lobbyCanvas: {fileID: 2100688297}
+  startCanvas: {fileID: 1674462080}
   startButton: {fileID: 667975780}
 --- !u!1001 &2116029784
 PrefabInstance:
@@ -6921,7 +6920,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnanswerButtonClicked
+      value: OnAnswerButtonClicked
       objectReference: {fileID: 0}
     - target: {fileID: 6007005703088181029, guid: e40e4b5622675884fa45515906fa870a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName

@@ -1,5 +1,5 @@
+using System.Collections;                  // ← 추가
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,42 +17,63 @@ public class GameManager : MonoBehaviour
         else if (Instance != this) Destroy(gameObject);
     }
 
-
-
     // 로비 화면 표시
     public void ShowLobby()
     {
-        lobbyCanvas.SetActive(true);  // 로비 켜기
+        lobbyCanvas.SetActive(true);
         quizCanvas.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(false);
         loadingCanvas.SetActive(false);
     }
 
-    // 퀴즈 화면 표시
+    public void StartGame()
+    {
+        lobbyCanvas.SetActive(false);
+        quizCanvas.gameObject.SetActive(true);
+        endScreen.gameObject.SetActive(false);
+        loadingCanvas.SetActive(false);
+        quizCanvas.StartQuiz();                // 무인자 오버로드 사용
+    }
+
     public void ShowQuiz()
     {
         lobbyCanvas.SetActive(false);
         quizCanvas.gameObject.SetActive(true);
         endScreen.gameObject.SetActive(false);
         loadingCanvas.SetActive(false);
-
-        quizCanvas.StartQuiz(); // 퀴즈 시작
+        quizCanvas.StartQuiz();
     }
 
-    // EndScreen 표시
     public void ShowEndScreen()
     {
         lobbyCanvas.SetActive(false);
         quizCanvas.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(true);
         loadingCanvas.SetActive(false);
-
         endScreen.ShowFinalScore();
     }
 
-    // 로비로 돌아가기
     public void ReturnToLobby()
     {
         ShowLobby();
+    }
+
+    // 다시하기: 로딩 → StartCanvas(=lobbyCanvas)
+    public void ReturnToStartCanvas()
+    {
+        StartCoroutine(LoadStartCanvasRoutine());
+    }
+
+    private IEnumerator LoadStartCanvasRoutine()
+    {
+        lobbyCanvas.SetActive(false);
+        quizCanvas.gameObject.SetActive(false);
+        endScreen.gameObject.SetActive(false);
+        loadingCanvas.SetActive(true);
+
+        yield return new WaitForSeconds(2f);
+
+        loadingCanvas.SetActive(false);
+        lobbyCanvas.SetActive(true);
     }
 }

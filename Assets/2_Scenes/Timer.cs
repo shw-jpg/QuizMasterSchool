@@ -1,4 +1,3 @@
-using Microsoft.Unity.VisualStudio.Editor;
 using TMPro;
 using UnityEngine;
 
@@ -9,10 +8,6 @@ public class Timer : MonoBehaviour
     float time = 0;
 
     [HideInInspector] public bool isProblemTime = true;
-    [HideInInspector] public float fillAmount;
-    [HideInInspector] public bool loadNextQuestion;
-
-    // ... 기존 코드 생략 ...
 
     [Header("UI표시")]
     [SerializeField] TextMeshProUGUI timerText;
@@ -23,36 +18,38 @@ public class Timer : MonoBehaviour
     private void Start()
     {
         time = problemTime;
-        loadNextQuestion = true;
     }
 
     private void Update()
     {
         if (isPaused) return;
         TimerCountDown();
-        UpdateFillAmount();
         UpdateTimerText();
-        TimeColor();
+        TimeColor(); // 그라데이션
     }
 
-    private void UpdateFillAmount()
+    public void StartProblemPhase()
     {
-        if (isProblemTime)
-            fillAmount = time / problemTime;
-
-        else
-            fillAmount = time / solutionTime;
-    }
-
-    public void Resumetimer()
-    {
+        isProblemTime = true;
+        time = problemTime;
         isPaused = false;
     }
 
-    public void Pausetimer()
+    public void StartSolutionPhase()
     {
-        isPaused = true;
+        isProblemTime = false;
+        time = solutionTime;
+        isPaused = false;
     }
+
+    public int GetRemainingWholeSeconds()
+    {
+        return Mathf.CeilToInt(time);
+    }
+
+    public void Resumetimer() { isPaused = false; }
+    public void Pausetimer() { isPaused = true; }
+    public void CancelTimer() { time = 0; }
 
     private void TimerCountDown()
     {
@@ -68,38 +65,22 @@ public class Timer : MonoBehaviour
             {
                 isProblemTime = true;
                 time = problemTime;
-                loadNextQuestion = true;
             }
         }
     }
 
     private void UpdateTimerText()
     {
-        int displayTime = Mathf.CeilToInt(time);
-
-        timerText.text = displayTime.ToString();
+        timerText.text = Mathf.CeilToInt(time).ToString();
     }
 
-    public void CancelTimer()
+    private void TimeColor()
     {
-        time = 0;
-    }
-
-    // ... 기존 코드 생략 ...
-
-    public void TimeColor()
-    {
-        if (time > 7f)
-        {
-            timerImage.color = Color.green;
-        }
-        else if (time > 3f)
-        {
-            timerImage.color = Color.yellow;
-        }
-        else
-        {
-            timerImage.color = Color.red;
-        }
+        float total = isProblemTime ? problemTime : solutionTime;
+        float t = Mathf.Clamp01(time / total);
+        Color c = (t > 0.5f)
+            ? Color.Lerp(Color.yellow, Color.green, (t - 0.5f) / 0.5f)
+            : Color.Lerp(Color.red, Color.yellow, t / 0.5f);
+        timerImage.color = c;
     }
 }
