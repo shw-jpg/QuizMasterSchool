@@ -1,4 +1,4 @@
-using System.Collections;                  // ¡ç Ãß°¡
+ï»¿using System.Collections;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -13,11 +13,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject loadingCanvas;
     [SerializeField] private Quiz quiz;
     [SerializeField] private EndScreen endScreen;
-    [SerializeField] private GameObject losdingCanves;
+    [SerializeField] private GameObject losdingCanves; // ì˜¤íƒ€ ìˆìŒ (ì•„ë˜ ì°¸ê³ )
 
-
-    [Header("Quiz Reference")]
-    [SerializeField] private Quiz quiz;
+    // ğŸ‘‡ ì´ ì¤„ì€ ì‚­ì œí•´ì•¼ í•¨ (ì¤‘ë³µ ì„ ì–¸)
+    // [SerializeField] private Quiz quiz;
 
     void Awake()
     {
@@ -25,7 +24,6 @@ public class GameManager : MonoBehaviour
         else if (Instance != this) Destroy(gameObject);
     }
 
-    // ·Îºñ È­¸é Ç¥½Ã
     public void ShowLobby()
     {
         lobbyCanvas.SetActive(true);
@@ -45,7 +43,7 @@ public class GameManager : MonoBehaviour
     {
         quiz.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(true);
-        endScreen.ShowFinalScore();  // Á¡¼ö Ç¥½Ã
+        endScreen.ShowFinalScore();
         losdingCanves.SetActive(false);
     }
 
@@ -61,7 +59,6 @@ public class GameManager : MonoBehaviour
         ShowLobby();
     }
 
-    // ´Ù½ÃÇÏ±â: ·Îµù ¡æ StartCanvas(=lobbyCanvas)
     public void ReturnToStartCanvas()
     {
         StartCoroutine(LoadStartCanvasRoutine());
