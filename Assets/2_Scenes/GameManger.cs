@@ -34,17 +34,36 @@ public class GameManager : MonoBehaviour
         loadingCanvas.SetActive(false);
     }
 
+<<<<<<< HEAD
     public void ShowQuizScreen()
+=======
+    public void StartGame()
+    {
+        lobbyCanvas.SetActive(false);
+        quizCanvas.gameObject.SetActive(true);
+        endScreen.gameObject.SetActive(false);
+        loadingCanvas.SetActive(false);
+        quizCanvas.StartQuiz();                // 무인자 오버로드 사용
+    }
+
+    public void ShowQuiz()
+>>>>>>> 2e1b27fbb027c4887117ed51c13b92d4fd5ffbfa
     {
         quiz.gameObject.SetActive(true);
         endScreen.gameObject.SetActive(false);
+<<<<<<< HEAD
         losdingCanves.SetActive(false);
+=======
+        loadingCanvas.SetActive(false);
+        quizCanvas.StartQuiz();
+>>>>>>> 2e1b27fbb027c4887117ed51c13b92d4fd5ffbfa
     }
 
     public void ShowEndScreen()
     {
         quiz.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(true);
+<<<<<<< HEAD
         endScreen.ShowFinalScore();  // 점수 표시
         losdingCanves.SetActive(false);
     }
@@ -54,6 +73,10 @@ public class GameManager : MonoBehaviour
         quiz.gameObject.SetActive(false);
         endScreen.gameObject.SetActive(false);
         losdingCanves.SetActive(true);
+=======
+        loadingCanvas.SetActive(false);
+        endScreen.ShowFinalScore();
+>>>>>>> 2e1b27fbb027c4887117ed51c13b92d4fd5ffbfa
     }
 
     public void ReturnToLobby()
