@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
-using Newtonsoft.Json;
 
 [Serializable]
 public class ChatGPTRequest
@@ -12,7 +11,7 @@ public class ChatGPTRequest
     public string model = "gpt-4.1-nano";
     public Message[] messages;
     public float temperature = 1.1f;
-    public int max_tokens = 4000; // max_completion_tokens 대신 max_tokens
+    public int max_completion_tokens = 4000;
 }
 
 [Serializable]
@@ -22,6 +21,7 @@ public class Message
     public string content;
 }
 
+// OpenAI 응답 래퍼
 [Serializable]
 public class ChatGPTResponse
 {
@@ -34,8 +34,9 @@ public class Choice
     public Message message;
 }
 
+// JSON 파싱용 QuizData 래퍼
 [Serializable]
-public class QuizData
+public class QuizDataWrapper
 {
     public QuizQuestion[] questions;
 }
@@ -58,12 +59,10 @@ public class ChatGPTClient : MonoBehaviour
 
     private void Awake()
     {
-        apiKey = LoadApiKey();
-        if (string.IsNullOrEmpty(apiKey))
-            Debug.LogError("OpenAI API Key가 비어있습니다. Resources/config.txt 확인 필요!");
+        apiKey = LoadFromResources();
     }
 
-    private string LoadApiKey()
+    private string LoadFromResources()
     {
         try
         {
@@ -93,21 +92,20 @@ public class ChatGPTClient : MonoBehaviour
 
     private IEnumerator RequestQuizQuestions(int count, string topic)
     {
-        string prompt = $"다음 조건에 맞는 창의적이고 재미있는 객관식 퀴즈 문제를 {count}개 생성해주세요:\n" +
+        string prompt = $"다음 조건에 맞는 객관식 퀴즈 문제를 {count}개 생성해주세요:\n" +
                         $"주제: {topic}\n" +
                         "조건:\n" +
-                        "- 각 문제는 4개의 선택지\n" +
-                        "- 문제는 다양한 난이도 포함\n" +
+                        "- 각 문제는 4개의 선택지를 가져야 합니다\n" +
                         "- 정답은 0~3 인덱스로 표시\n" +
-                        "- JSON 형식으로만 제공\n" +
-                        "{\n\"questions\": [{\"question\": \"문제 내용\", \"answers\": [\"1\",\"2\",\"3\",\"4\"], \"correctAnswerIndex\":0}]\n}";
+                        "- 응답은 반드시 다음 JSON 형식으로 제공\n" +
+                        "{ \"questions\": [ { \"question\": \"문제 내용\", \"answers\": [\"1\",\"2\",\"3\",\"4\"], \"correctAnswerIndex\": 0 } ] }";
 
         ChatGPTRequest request = new ChatGPTRequest
         {
             messages = new Message[] { new Message { role = "user", content = prompt } }
         };
 
-        string jsonRequest = JsonConvert.SerializeObject(request);
+        string jsonRequest = JsonUtility.ToJson(request);
 
         using (UnityWebRequest webRequest = new UnityWebRequest(API_URL, "POST"))
         {
@@ -116,59 +114,50 @@ public class ChatGPTClient : MonoBehaviour
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/json");
             webRequest.SetRequestHeader("Authorization", $"Bearer {apiKey}");
-            webRequest.timeout = 15;
 
             yield return webRequest.SendWebRequest();
 
             if (webRequest.result == UnityWebRequest.Result.Success)
             {
+                string rawResponse = webRequest.downloadHandler.text;
+                Debug.Log("Raw response: " + rawResponse);
+
                 try
                 {
-                    string rawResponse = webRequest.downloadHandler.text;
-                    Debug.Log("Raw response: " + rawResponse);
-
-                    ChatGPTResponse response = JsonConvert.DeserializeObject<ChatGPTResponse>(rawResponse);
-
+                    ChatGPTResponse response = JsonUtility.FromJson<ChatGPTResponse>(rawResponse);
                     if (response?.choices == null || response.choices.Length == 0)
                     {
-                        Debug.LogError("ChatGPT 응답이 없습니다.");
+                        Debug.LogError("ChatGPT 응답 구조 오류");
                         yield break;
                     }
 
                     string content = response.choices[0].message.content.Trim();
 
-                    // ``` 제거
+                    // ```json 코드 블록 제거
                     if (content.StartsWith("```json")) content = content.Substring(7);
-                    if (content.StartsWith("```")) content = content.Substring(3);
                     if (content.EndsWith("```")) content = content.Substring(0, content.Length - 3);
                     content = content.Trim();
 
-                    QuizData quizData = JsonConvert.DeserializeObject<QuizData>(content);
-                    if (quizData == null || quizData.questions == null || quizData.questions.Length == 0)
-                    {
-                        Debug.LogError("QuizData 파싱 실패");
-                        yield break;
-                    }
-
-                    List<QuestionSO> questionSOs = new List<QuestionSO>();
+                    // JSON 파싱
+                    QuizDataWrapper quizData = JsonUtility.FromJson<QuizDataWrapper>(content);
+                    List<QuestionSO> generatedQuestions = new List<QuestionSO>();
                     foreach (var q in quizData.questions)
                     {
                         QuestionSO so = ScriptableObject.CreateInstance<QuestionSO>();
                         so.SetData(q.question, q.answers, q.correctAnswerIndex);
-                        questionSOs.Add(so);
+                        generatedQuestions.Add(so);
                     }
 
-                    quizGenerateHandler?.Invoke(questionSOs);
+                    quizGenerateHandler?.Invoke(generatedQuestions);
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("응답 파싱 오류: " + e.Message);
+                    Debug.LogError($"응답 파싱 오류: {e.Message}");
                 }
             }
             else
             {
-                Debug.LogError($"API 요청 실패: {webRequest.error} (Code: {webRequest.responseCode})");
-                Debug.LogError("응답: " + webRequest.downloadHandler.text);
+                Debug.LogError($"ChatGPT API 요청 실패: {webRequest.error}");
             }
         }
     }
