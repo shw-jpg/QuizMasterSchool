@@ -3230,9 +3230,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lobbyCanvas: {fileID: 2100688297}
-  quizCanvas: {fileID: 1598487928}
-  endScreen: {fileID: 1868528291}
+  startCanvas: {fileID: 1674462080}
+  quizCanvas: {fileID: 1598487923}
+  winCanvas: {fileID: 1868528290}
   loadingCanvas: {fileID: 2002381122}
+  quiz: {fileID: 1598487928}
+  endScreen: {fileID: 1868528291}
 --- !u!4 &932225869
 Transform:
   m_ObjectHideFlags: 0
@@ -5368,7 +5371,7 @@ MonoBehaviour:
   - {fileID: 2057589240}
   defaultAnswerSprite: {fileID: -2421234149185767044, guid: d35bcec9d938d1b4ea570b740bea1b25, type: 3}
   correctAnswerSprite: {fileID: -4659264650518790821, guid: 7bcdbe82b92fac14f89a70b7939cfe79, type: 3}
-  selectedAnswerSprite: {fileID: 0}
+  timerImage: {fileID: 813556760}
   scoreText: {fileID: 310656662}
   progressBar: {fileID: 1722746626}
   chatGPTClinet: {fileID: 1145773222}
@@ -5377,6 +5380,7 @@ MonoBehaviour:
   hintButton: {fileID: 951995664}
   hintText: {fileID: 140895014}
   appleSlotDisplay: {fileID: 1884548794}
+  winCanvas: {fileID: 1868528290}
 --- !u!1 &1636126271
 GameObject:
   m_ObjectHideFlags: 0

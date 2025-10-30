@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,38 +6,45 @@ using UnityEngine.UI;
 public class Quiz : MonoBehaviour
 {
     [Header("질문")]
-    [SerializeField] TextMeshProUGUI questionText;
-    [SerializeField] List<QuestionSO> questions = new List<QuestionSO>();
-    QuestionSO currentQuestion;
+    [SerializeField] private TextMeshProUGUI questionText;
+    [SerializeField] private List<QuestionSO> questions = new List<QuestionSO>();
+    private QuestionSO currentQuestion;
 
     [Header("보기")]
-    [SerializeField] GameObject[] answerButtonArr;
-    [SerializeField] Sprite defaultAnswerSprite;
-    [SerializeField] Sprite correctAnswerSprite;
-    [SerializeField] Sprite selectedAnswerSprite;
+    [SerializeField] private GameObject[] answerButtonArr;
+
+    [Header("버튼 색깔")]
+    [SerializeField] private Sprite defaultAnswerSprite; // 파란색
+    [SerializeField] private Sprite correctAnswerSprite; // 주황색
 
     [Header("Timer")]
-    Timer timer;
+    [SerializeField] private Image timerImage;
+    private Timer timer;
 
     [Header("점수")]
-    [SerializeField] TextMeshProUGUI scoreText;
-    ScoreKeeper scoreKeeper;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    private ScoreKeeper scoreKeeper;
 
     [Header("ProgressBar")]
-    [SerializeField] Slider progressBar;
+    [SerializeField] private Slider progressBar;
 
     [Header("ChatGPTClient")]
-    [SerializeField] ChatGPTClient chatGPTClinet;
-    [SerializeField] int questionCount = 3;
-    [SerializeField] TextMeshProUGUI loadingText;
-    bool isGenerateQuestions = false;
+    [SerializeField] private ChatGPTClient chatGPTClinet;
+    [SerializeField] private int questionCount = 3;
+    [SerializeField] private TextMeshProUGUI loadingText;
+    private bool isGenerateQuestions = false;
 
     [Header("힌트")]
-    [SerializeField] Button hintButton;
-    [SerializeField] TextMeshProUGUI hintText;
+    [SerializeField] private Button hintButton;
+    [SerializeField] private TextMeshProUGUI hintText;
 
     [Header("Apple Slot")]
-    [SerializeField] AppleSlotDisplay appleSlotDisplay;
+    [SerializeField] private AppleSlotDisplay appleSlotDisplay;
+
+    [Header("Canvas")]
+    [SerializeField] private GameObject winCanvas;
+
+    private bool chooseAnswer = false;
 
     void Start()
     {
@@ -46,11 +52,16 @@ public class Quiz : MonoBehaviour
         scoreKeeper = FindFirstObjectByType<ScoreKeeper>();
         chatGPTClinet.quizGenerateHandler += QuizGeneratedHandler;
 
+        if (winCanvas != null)
+            winCanvas.SetActive(false);
+
         hintButton.onClick.AddListener(ShowHint);
         hintText.gameObject.SetActive(false);
 
         if (questions.Count <= 0)
+        {
             GenerateQuestionsIfNeeded();
+        }
         else
         {
             InitializeProgressBar();
@@ -63,17 +74,13 @@ public class Quiz : MonoBehaviour
         if (isGenerateQuestions) return;
         isGenerateQuestions = true;
 
-        string topicToUse = StartCanvas.QuizCategory.selectedCategory >= 0
-            ? GetTopicName(StartCanvas.QuizCategory.selectedCategory)
-            : GetTrendingTopic();
+        GameManager.Instance.ShowLoadingScreen();
+
+        int selectedCategory = StartCanvas.QuizCategory.selectedCategory;
+        string topicToUse = GetTopicName(selectedCategory);
 
         chatGPTClinet.GenerateQuizQuestions(questionCount, topicToUse);
-    }
-
-    private string GetTrendingTopic()
-    {
-        string[] topics = { "과학", "역사", "스포츠", "영화", "음악", "문학", "기술", "지리", "예술", "동물", "음식" };
-        return topics[Random.Range(0, topics.Length)];
+        Debug.Log($"GenerateQuestionsIfNeeded: {topicToUse}");
     }
 
     private string GetTopicName(int selectedCategory)
@@ -89,24 +96,7 @@ public class Quiz : MonoBehaviour
         }
     }
 
-    public void StartQuiz(int selectedCategory)
-    {
-        Debug.Log($"선택된 카테고리: {selectedCategory}");
-        StartCanvas.QuizCategory.selectedCategory = selectedCategory;
-
-        questions.Clear();
-        progressBar.value = 0;
-
-        GenerateQuestionsForCategory(selectedCategory);
-    }
-
-    private void GenerateQuestionsForCategory(int selectedCategory)
-    {
-        string topic = GetTopicName(selectedCategory);
-        chatGPTClinet.GenerateQuizQuestions(questionCount, topic);
-    }
-
-    void QuizGeneratedHandler(List<QuestionSO> generatedQuestions)
+    private void QuizGeneratedHandler(List<QuestionSO> generatedQuestions)
     {
         isGenerateQuestions = false;
 
@@ -116,9 +106,13 @@ public class Quiz : MonoBehaviour
             return;
         }
 
+        questions.Clear();
         questions.AddRange(generatedQuestions);
+
         InitializeProgressBar();
         GetNextQuestion();
+
+        GameManager.Instance.ShowQuizScreen();
     }
 
     private void InitializeProgressBar()
@@ -131,13 +125,14 @@ public class Quiz : MonoBehaviour
     {
         if (questions.Count <= 0)
         {
-            GameManager.Instance.ShowEndScreen();
+            ShowWinCanvas();
             return;
         }
 
         currentQuestion = questions[0];
         questions.RemoveAt(0);
 
+        chooseAnswer = false;
         SetButtonState(true);
         SetDefaultButtonSprites();
         DisplayQuestion();
@@ -152,93 +147,81 @@ public class Quiz : MonoBehaviour
         hintText.gameObject.SetActive(false);
 
         for (int i = 0; i < answerButtonArr.Length; i++)
+        {
             answerButtonArr[i].GetComponentInChildren<TextMeshProUGUI>().text = currentQuestion.Getanswer(i);
-
-        timer.StartProblemPhase();  // 10초 타이머 시작
+        }
     }
 
     public void OnAnswerButtonClicked(int index)
     {
-        int remain = timer.GetRemainingWholeSeconds(); // 남은 초
-
+        chooseAnswer = true;
         DisplaySolution(index);
         timer.CancelTimer();
-        timer.Pausetimer();
-
         scoreText.text = $"Score:{scoreKeeper.GetCurrentScore()}점";
-        Invoke(nameof(GetNextQuestion), 1.0f);
+
+        Invoke(nameof(GetNextQuestion), 1.5f);
     }
 
     private void DisplaySolution(int index)
     {
-        if (index == currentQuestion.GetCorrectAnswerIndex())
+        int correctIndex = currentQuestion.GetCorrectAnswerIndex();
+
+        if (index == correctIndex)
         {
             questionText.text = "정답입니다!";
-
-            // 정답 버튼을 주황색으로 변경
-            answerButtonArr[index].GetComponent<Image>().sprite = selectedAnswerSprite;
-
+            answerButtonArr[index].GetComponent<Image>().sprite = correctAnswerSprite;
             scoreKeeper.IncrementCorrectAnswers();
-
-            int bonus = timer.GetRemainingWholeSeconds();
-            scoreKeeper.AddScore(bonus);
-
             appleSlotDisplay.AddApple();
         }
         else
         {
             questionText.text = "틀렸습니다! 정답: " + currentQuestion.GetCorrectAnswer();
-
-            // 정답 버튼 찾아서 주황색 표시
-            int correct = currentQuestion.GetCorrectAnswerIndex();
-            answerButtonArr[correct].GetComponent<Image>().sprite = selectedAnswerSprite;
-
             appleSlotDisplay.RemoveApple();
         }
 
         SetButtonState(false);
-        timer.StartSolutionPhase(); // 정답 표시 시간 유지
     }
 
     private void SetDefaultButtonSprites()
     {
         foreach (GameObject obj in answerButtonArr)
+        {
             obj.GetComponent<Image>().sprite = defaultAnswerSprite;
+        }
     }
 
     private void SetButtonState(bool state)
     {
         foreach (GameObject obj in answerButtonArr)
+        {
             obj.GetComponent<Button>().interactable = state;
-    }
-
-    private void OnAllQuestionsFinished()
-    {
-        StartCoroutine(ShowLoadingThenEnd());
-    }
-
-    private IEnumerator ShowLoadingThenEnd()
-    {
-        GameManager.Instance.ShowEndScreen();
-        yield return null;
+        }
     }
 
     private void ShowHint()
     {
-        string h = currentQuestion.GetHint();
-        if (string.IsNullOrEmpty(h) || h == "빈값")
-        {
-            string ans = currentQuestion.GetCorrectAnswer();
-            string fallback = ans.Length > 1 ? $"{ans[0]}… ({ans.Length}글자)" : ans;
-            h = $"정답 힌트: {fallback}";
-        }
-
-        hintText.text = h;
+        hintText.text = "힌트: " + currentQuestion.GetHint();
         hintText.gameObject.SetActive(true);
     }
 
-    public void StartQuiz()
+    private void ShowWinCanvas()
     {
-        StartQuiz(0);
+        if (winCanvas != null)
+            winCanvas.SetActive(true);
+    }
+
+    public void StartQuiz(int selectedCategory)
+    {
+        Debug.Log($"[Quiz] StartQuiz 실행됨 — 선택된 카테고리: {selectedCategory}");
+
+        // 선택 카테고리 저장
+        StartCanvas.QuizCategory.selectedCategory = selectedCategory;
+
+        // 문제 생성
+        GenerateQuestionsIfNeeded();
+
+        // WinCanvas 숨기기
+        if (winCanvas != null)
+            winCanvas.SetActive(false);
     }
 }
